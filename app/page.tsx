@@ -1,3 +1,7 @@
+"use client"; // tells Next.js this component needs to run in the browser
+
+import { useState } from "react"; // a react hook that lets a component remember changing information
+
 type MemberCardProps = {
     name: string;
     calls: number;
@@ -11,7 +15,7 @@ function MemberCard({ name, calls, goal, streak, minutes }: MemberCardProps) {
 
     return (
         <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between"> 
+            <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">
                     {name}
                 </h3>
@@ -23,8 +27,8 @@ function MemberCard({ name, calls, goal, streak, minutes }: MemberCardProps) {
 
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-stone-100">
                 <div
-                className="h-full rounded-full bg-stone-900"
-                style={{ width: `${progress}%` }}
+                    className="h-full rounded-full bg-stone-900"
+                    style={{ width: `${progress}%` }}
                 />
             </div>
 
@@ -40,6 +44,26 @@ function MemberCard({ name, calls, goal, streak, minutes }: MemberCardProps) {
 }
 
 export default function Home() {
+
+    const [calls, setCalls] = useState(0); // tells react to create a state with initial value of 1
+    const [minutes, setMinutes] = useState(0);
+    const [duration, setDuration] = useState("");
+    const [message, setMessage] = useState("");
+
+    function handleLogCall() {
+        const callDuration = Number(duration);
+
+        if (callDuration < 1) {
+            setMessage("Calls must be at least 1 minute to count.");
+            return;
+        }
+
+        setCalls(calls + 1);
+        setMinutes(minutes + callDuration);
+        setMessage("Call logged! 📞");
+        setDuration("");
+    }
+
     return (
         <main className="min-h-screen bg-stone-50 px-6 py-10 text-stone-900">
             <div className="mx-auto max-w-md">
@@ -65,10 +89,10 @@ export default function Home() {
 
                     <MemberCard
                         name="Kakak"
-                        calls={2}
+                        calls={calls}
                         goal={2}
                         streak={4}
-                        minutes={120}
+                        minutes={minutes}
                     />
 
                     <MemberCard
@@ -80,7 +104,38 @@ export default function Home() {
                     />
                 </section>
 
-                <button>I called! </button>
+                <div className="mt-8">
+                    <label
+                        htmlFor="duration"
+                        className="mb-2 block text-sm font-medium"
+                    >
+                        Call duration (minutes)
+                    </label>
+
+                    <input
+                        id="duration"
+                        type="number"
+                        min="0"
+                        value={duration}
+                        onChange={(event) => setDuration(event.target.value)}
+                        placeholder="e.g. 20"
+                        className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 outline-none"
+                    />
+
+                    <button
+                        onClick={handleLogCall} // handleLogCall NOT handleLogCall() because we don't want to call the function immediately while rendering
+                        className="mt-3 w-full rounded-xl bg-stone-900 px-4 py-3 font-medium text-white"
+                    >
+                        Log call
+                    </button>
+
+                    {message && (
+                        <p className="mt-3 text-sm text-stone-600">
+                            {message}
+                        </p>
+                    )}
+
+                </div>
 
             </div>
         </main>
