@@ -10,6 +10,12 @@ type MemberCardProps = {
     minutes: number;
 };
 
+type CallLog = {
+    id: number;
+    duration: number;
+    calledAt: Date;
+}
+
 function MemberCard({ name, calls, goal, streak, minutes }: MemberCardProps) {
     const progress = Math.min((calls / goal) * 100, 100);
 
@@ -45,10 +51,16 @@ function MemberCard({ name, calls, goal, streak, minutes }: MemberCardProps) {
 
 export default function Home() {
 
-    const [calls, setCalls] = useState(0); // tells react to create a state with initial value of 1
-    const [minutes, setMinutes] = useState(0);
+    const [callLogs, setCallLogs] = useState<CallLog[]>([]); // tells react to create some state whose value is an array of CallLog objects.
     const [duration, setDuration] = useState("");
     const [message, setMessage] = useState("");
+
+    const calls = callLogs.length;
+
+    const minutes = callLogs.reduce(
+        (total, call) => total + call.duration,
+        0
+    );
 
     function handleLogCall() {
         const callDuration = Number(duration);
@@ -58,8 +70,13 @@ export default function Home() {
             return;
         }
 
-        setCalls(calls + 1);
-        setMinutes(minutes + callDuration);
+        const newCall: CallLog = {
+            id: Date.now(),
+            duration: callDuration,
+            calledAt: new Date(),
+        }
+
+        setCallLogs([...callLogs, newCall]);
         setMessage("Call logged! 📞");
         setDuration("");
     }
